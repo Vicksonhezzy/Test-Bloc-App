@@ -88,9 +88,10 @@ class UiWidgets {
 
   static submitButton(
       {required BuildContext context,
+      required BuildContext widgetContexts,
       required String text,
       required Function function}) {
-    return BlocBuilder<SubmitCubit, bool>(builder: (context, loading) {
+    return BlocBuilder<SubmitCubit, bool>(builder: (contexts, loading) {
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthMultiplier * 3.2),
         child: Container(
@@ -116,7 +117,7 @@ class UiWidgets {
                         fontWeight: FontWeight.w700,
                         fontSize: 18),
                   ),
-                  onPressed: () => function(context)),
+                  onPressed: () => function(context, contexts, widgetContexts)),
         ),
       );
     });

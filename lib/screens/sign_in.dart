@@ -24,33 +24,33 @@ TextEditingController phone = TextEditingController();
 double textMultiplier = SizeConfig.textMultiplier;
 double widthMultiplier = SizeConfig.widthMultiplier;
 
-onSubmit(BuildContext context) async {
+onSubmit(BuildContext context, BuildContext contexts, widgetContexts) async {
   if (formKey.currentState!.validate()) {
     formKey.currentState!.save();
     String message = 'Something went wrong. Try again later';
-    context.read<SubmitCubit>().add(LoadingTrue());
-    print('bool = ${context.read<SubmitCubit>().state}');
+    contexts.read<SubmitCubit>().add(LoadingTrue());
+    // print('bool = ${context.read<SubmitCubit>().state}');
     switch (pageState) {
       case 0:
         try {
           var res = await http.get(Uri.parse(userExistUrl + email.text));
           if (res.statusCode == 200) {
-            print('response = ${res.body}');
+            // print('response = ${res.body}');
             var response = jsonDecode(res.body);
             if (response['response']['subject'] == 'Record Found') {
               message = 'User exist';
-              context.read<SubmitCubit>().add(LoadingFalse());
-              context.read<WidgetBloc>().add(SignIn());
+              contexts.read<SubmitCubit>().add(LoadingFalse());
+              widgetContexts.read<WidgetBloc>().add(SignIn());
             } else {
               message = 'User does not exist';
-              context.read<WidgetBloc>().add(SignUp());
+              widgetContexts.read<WidgetBloc>().add(SignUp());
               // UiWidgets.showAlert(
               //     context: context, value: {'message': message});
             }
-            print('response = ${res.body}');
+            // print('response = ${res.body}');
           } else {
             message = 'Something went wrong';
-            print('response = ${res.reasonPhrase}');
+            // print('response = ${res.reasonPhrase}');
           }
         } catch (e) {
           message = e.toString();
@@ -62,7 +62,7 @@ onSubmit(BuildContext context) async {
               body: {'username': email.text, 'password': password.text});
           if (res.statusCode == 200) {
             message = 'Sign in was successful';
-            print('response = ${res.body}');
+            // print('response = ${res.body}');
             var response = jsonDecode(res.body);
             if (response['response']['subject'] == 'Record Found') {
               context.read<Models>().setUserAuth(
@@ -73,19 +73,19 @@ onSubmit(BuildContext context) async {
               //     id: response['response']['data']['1']['userguid'],
               //     email: response['response']['data']['1']['email'],
               //     username: response['response']['data']['1']['username']);
-              context.read<SubmitCubit>().add(LoadingFalse());
+              contexts.read<SubmitCubit>().add(LoadingFalse());
               Navigator.pushReplacementNamed(context, '/Dashboard');
             } else {
               message = 'Invalid Email/Password';
-              context.read<SubmitCubit>().add(LoadingFalse());
+              contexts.read<SubmitCubit>().add(LoadingFalse());
               UiWidgets.showAlert(
                   context: context, value: {'message': message});
             }
           } else {
             message = 'Something went wrong';
-            context.read<SubmitCubit>().add(LoadingFalse());
+            contexts.read<SubmitCubit>().add(LoadingFalse());
             UiWidgets.showAlert(context: context, value: {'message': message});
-            print('response = ${res.reasonPhrase}');
+            // print('response = ${res.reasonPhrase}');
           }
         } catch (e) {
           message = e.toString();
@@ -101,7 +101,7 @@ onSubmit(BuildContext context) async {
           });
           if (res.statusCode == 200) {
             message = 'Sign up was successful';
-            print('response = ${res.body}');
+            // print('response = ${res.body}');
             var response = jsonDecode(res.body);
             if (response['response']['subject'] == 'Record Found') {
               context.read<Models>().setUserAuth(
@@ -112,31 +112,31 @@ onSubmit(BuildContext context) async {
               //     id: response['response']['data']['1']['userguid'],
               //     email: response['response']['data']['1']['email'],
               //     username: response['response']['data']['1']['username']);
-              context.read<SubmitCubit>().add(LoadingFalse());
+              contexts.read<SubmitCubit>().add(LoadingFalse());
               Navigator.pushReplacementNamed(context, '/Dashboard');
             } else {
               message = 'Invalid Email/Password';
-              context.read<SubmitCubit>().add(LoadingFalse());
+              contexts.read<SubmitCubit>().add(LoadingFalse());
               UiWidgets.showAlert(
                   context: context, value: {'message': message});
             }
           } else {
             message = 'Something went wrong';
-            context.read<SubmitCubit>().add(LoadingFalse());
+            contexts.read<SubmitCubit>().add(LoadingFalse());
             UiWidgets.showAlert(context: context, value: {'message': message});
-            print('response = ${res.reasonPhrase}');
+            // print('response = ${res.reasonPhrase}');
           }
         } catch (e) {
           message = e.toString();
-          context.read<SubmitCubit>().add(LoadingFalse());
+          contexts.read<SubmitCubit>().add(LoadingFalse());
           UiWidgets.showAlert(context: context, value: {'message': message});
         }
         break;
       default:
     }
-    context.read<SubmitCubit>().add(LoadingFalse());
-    print('bool = ${context.read<SubmitCubit>().state}');
-    print('message = $message');
+    contexts.read<SubmitCubit>().add(LoadingFalse());
+    // print('bool = ${context.read<SubmitCubit>().state}');
+    // print('message = $message');
   }
 }
 
@@ -254,10 +254,7 @@ class LoginView extends StatelessWidget {
                               SizedBox(height: textMultiplier * 2),
                               widget,
                               SizedBox(height: textMultiplier * 1.5),
-                              UiWidgets.submitButton(
-                                  context: context,
-                                  text: type,
-                                  function: onSubmit),
+                              Submit(contexts: contexts),
                               SizedBox(height: textMultiplier * 1.2),
                             ],
                           ),
@@ -272,5 +269,22 @@ class LoginView extends StatelessWidget {
         ),
       );
     });
+  }
+}
+
+class Submit extends StatelessWidget {
+  final BuildContext contexts;
+  const Submit({required this.contexts, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => SubmitCubit(),
+      child: UiWidgets.submitButton(
+          widgetContexts: contexts,
+          context: context,
+          text: type,
+          function: onSubmit),
+    );
   }
 }

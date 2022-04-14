@@ -24,8 +24,7 @@ class LoadingTrue extends SetLoading {}
 class LoadingFalse extends SetLoading {}
 
 class SubmitCubit extends Bloc<SetLoading, bool> {
-  static bool isLoading = false;
-  SubmitCubit() : super(isLoading) {
+  SubmitCubit() : super(false) {
     on<LoadingTrue>((event, emit) => emit(true));
     on<LoadingFalse>((event, emit) => emit(false));
   }

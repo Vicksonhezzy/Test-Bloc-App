@@ -16,13 +16,14 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    if (bloc is Cubit) print(change);
+    if (bloc is Cubit) change;
   }
 
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    print(transition);
+    transition;
+    // print(transition);
   }
 }
 
@@ -45,20 +46,29 @@ class MyAppPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => ThemeCubit(),
-      child: const App(),
+      child: const AppPage(),
     );
   }
 }
+
+// class App extends StatelessWidget {
+//   const App({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocProvider(
+//       create: (_) => SubmitCubit(),
+//       child: const AppPage(),
+//     );
+//   }
+// }
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SubmitCubit(),
-      child: const AppPage(),
-    );
+    return BlocProvider.value(value: context.read<SubmitCubit>());
   }
 }
 
